@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 // import goldenGlobesData from "./data/golden-globes.json";
 // import netflixData from "./data/netflix-titles.json";
 // import topMusicData from "./data/top-music.json";
+import booksData from "./data/books.json"
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/project-mongo";
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -19,15 +20,47 @@ mongoose.Promise = Promise;
 // PORT=9000 npm start
 const port = process.env.PORT || 8080;
 const app = express();
+const listEndpoints = require('express-list-endpoints')
 
 // Add middlewares to enable cors and json body parsing
 app.use(cors());
 app.use(express.json());
 
+
+const { Schema } = mongoose;
+const bookSchema = new Schema({
+  bookID: Number,
+  title: String,
+  authors: String,
+  average_rating: Number,
+  isbn: Number,
+  isbn13: Number,
+  language_code: String,
+  num_pages: Number,
+  ratings_count: Number,
+  text_reviews_count: Number
+})
+
+const Book = mongoose.model("Book", bookSchema);
+
+if (process.env.RESET_DB) {
+  const resetDatabase = async () => {
+  await Book.deleteMany()
+  booksData.forEach((singleBook) => {
+    const newBook = new Book (singleBook)
+    newBook.save()
+  })
+}
+resetDatabase()
+
+}
+
 // Start defining your routes here
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!");
+res.json(listEndpoints(app));
 });
+
+
 
 // Start the server
 app.listen(port, () => {
