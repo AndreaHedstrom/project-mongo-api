@@ -60,7 +60,31 @@ app.get("/", (req, res) => {
 res.json(listEndpoints(app));
 });
 
-
+app.get("/book/id/:id", async (req,res) => {
+  try {
+    const singleBook = await Book.findById(req.params.id)
+    if (singleBook) {
+      res.status(200).json({
+        sucess: true,
+        body: singleBook
+      })
+    } else {
+      res.status(404).json({
+        sucess: false,
+        body: {
+          message: "Sorry, book not found"
+        }
+      })
+    }
+  } catch(error) {
+    res.status(500).json({
+      sucess: false,
+      body: {
+        message: error
+      }
+    })
+  }
+})
 
 // Start the server
 app.listen(port, () => {
