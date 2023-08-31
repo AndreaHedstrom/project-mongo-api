@@ -60,6 +60,7 @@ app.get("/", (req, res) => {
 res.json(listEndpoints(app));
 });
 
+// To get a specific book
 app.get("/book/id/:id", async (req,res) => {
   try {
     const singleBook = await Book.findById(req.params.id)
@@ -86,11 +87,25 @@ app.get("/book/id/:id", async (req,res) => {
   }
 })
 
-app.get("/authors", async (req, res) => {
-  const authors = await Author.find()
+// to get all authors
+app.get("/allAuthors", async (req, res) => {
+  try {
+  const allAuthors = await Authors.find();
+  res.status(200).json({
+    sucess: true,
+    body: allAuthors
+  })
+} catch(error) {
+  res.status(500).json({
+    sucess:false,
+    body: {
+      message: error
+    }
+  })
+}
+});
 
-  res.json(authors);
-})
+
 
 // Start the server
 app.listen(port, () => {
